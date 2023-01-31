@@ -82,7 +82,7 @@ async function alldata() {
 
 async function readJsonFile() {
     return new Promise((resolve, reject) => {
-        fs.readFile('data.json', (err, data) => {
+        fs.readFile('./data.json', (err, data) => {
             if (err) {
                 reject(err);
             } else {
@@ -99,7 +99,7 @@ async function writeJsonFile(data) {
         "data": data
     })
     return new Promise((resolve, reject) => {
-        fs.writeFile('data.json', alldata, (err) => {
+        fs.writeFile('./data.json', alldata, (err) => {
             if (err) {
                 reject(err)
                 console.error(err);
