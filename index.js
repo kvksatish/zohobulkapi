@@ -99,7 +99,7 @@ async function writeJsonFile(data) {
         "data": data
     })
     return new Promise((resolve, reject) => {
-        fs.writeFile('./data.json', alldata, (err) => {
+        fs.w('./data.json', alldata, (err) => {
             if (err) {
                 reject(err)
                 console.error(err);
