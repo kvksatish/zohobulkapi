@@ -7,27 +7,159 @@ const PORT = process.env.PORT || 8080
 const axios = require('axios')
 app.use(express.json())
 app.use(cors())
+const fs = require('fs');
 
 
-app.get("/getdata",
-    (req, response) => {
+async function fetcher1() {
+    let pres = await Promise.all(
 
-        console.log(req.query, "yguygu")
-        axios.post('https://accounts.zoho.com/oauth/v2/token?refresh_token=1000.260313936976b89cacb0d69520c1c8c2.0e1bbbd4705f525cf87e7cf36d8c99a0&client_id=1000.8UDNPM1C47UG4PY0XLSC858FDIVTGT&client_secret=e53821d729641e2be6ed7f9ae676b896fcddddda3a&grant_type=refresh_token').then((res) => {
-            console.log(res.data.access_token, "res")
-            axios.get(`https://zohoapis.com/crm/v2/Property_Inventory?page=${req.query.page}`, {
-                headers: {
-                    authorization: `Zoho-oauthtoken ${res.data.access_token}`
-                }
-            }).then((re) => {
-                response.send({ data: re.data })
-                console.log(res)
-            }).catch((re) => {
-                console.log(res)
-            })
+        [
+            axios.get(`https://zohocrmdata.vercel.app/getdata?page=1`),
+            axios.get(`https://zohoapi2.vercel.app/getdata?page=2`),
+            axios.get(`https://zohocrmdata.vercel.app/getdata?page=3`),
+        ]
+    )
 
-        })
+    let arr = [
+        ...pres[0].data.data.data,
+        ...pres[1].data.data.data,
+        ...pres[2].data.data.data,
+    ]
+
+    return arr
+}
+
+async function fetcher2() {
+    let pres = await Promise.all(
+
+        [
+            axios.get(`https://zohoapi2.vercel.app/getdata?page=4`),
+            axios.get(`https://zohocrmdata.vercel.app/getdata?page=5`),
+            axios.get(`https://zohoapi2.vercel.app/getdata?page=6`),
+        ]
+    )
+
+    let arr = [
+        ...pres[0].data.data.data,
+        ...pres[1].data.data.data,
+        ...pres[2].data.data.data,
+    ]
+
+    return arr
+}
+async function fetcher3() {
+    let pres = await Promise.all(
+
+        [
+            axios.get(`https://zohocrmdata.vercel.app/getdata?page=7`),
+            axios.get(`https://zohoapi2.vercel.app/getdata?page=8`),
+            axios.get(`https://zohocrmdata.vercel.app/getdata?page=9`),
+        ]
+    )
+
+    let arr = [
+        ...pres[0].data.data.data,
+        ...pres[1].data.data.data,
+        ...pres[2].data.data.data,
+    ]
+
+    return arr
+}
+
+async function alldata() {
+    console.log("alldata")
+
+    let resall = await Promise.all(
+        [
+            fetcher1(),
+            fetcher2(),
+            fetcher3()
+        ]
+    )
+    return [...resall[0], ...resall[1], ...resall[2]]
+}
+
+
+async function readJsonFile() {
+    return new Promise((resolve, reject) => {
+        fs.readFile('data.json', (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                const dataAsObject = JSON.parse(data);
+                resolve(dataAsObject);
+            }
+        });
+    });
+}
+
+
+async function writeJsonFile(data) {
+    let alldata = JSON.stringify({
+        "data": data
     })
+    return new Promise((resolve, reject) => {
+        fs.writeFile('data.json', alldata, (err) => {
+            if (err) {
+                reject(err)
+                console.error(err);
+            } else {
+                console.log('Data has been saved to data.json file.');
+                resolve(data)
+            }
+        })
+    });
+}
+
+//////////////////functions//////////////////////
+
+let requestin30min = false
+
+//////////////////////timers////////////////////////
+
+
+let timeoutId;
+
+function debouncedFunction() {
+    // console.log(requestin30min, 1);
+    requestin30min = true
+    //console.log(requestin30min, 2);
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+        // The actual function implementation goes here
+        //console.log(requestin30min, 3);
+        requestin30min = false
+        //console.log(requestin30min, 4);
+        timeoutId = null;
+    }, 1000 * 60 * 20);
+}
+
+
+
+setInterval(() => {
+    console.log(requestin30min)
+    if (requestin30min) {
+        alldata().then((res) => {
+            writeJsonFile(res).then((res) => {
+                console.log("wrote")
+            })
+        })
+    }
+}, 1000 * 60 * 5);
+
+
+//////////////////requests/////////////////////////
+
+
+app.get("/getdata", (req, response) => {
+    debouncedFunction()
+    readJsonFile().then((res) => {
+        console.log('getdata')
+        response.send(res)
+    })
+})
 
 app.listen(PORT, async () => {
     console.log(`listening on PORT ${PORT}`)
