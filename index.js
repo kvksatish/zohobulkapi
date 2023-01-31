@@ -19,7 +19,7 @@ async function fetcher1() {
             axios.get(`https://zohocrmdata.vercel.app/getdata?page=3`),
         ]
     )
-
+    ////////
     let arr = [
         ...pres[0].data.data.data,
         ...pres[1].data.data.data,
