@@ -17,8 +17,8 @@ app.use(cors());
 app.get("/getdata", async (req, res) => {
 
     console.log(req.query, "dcscscscwe")
-    nextGet = req?.query?.nextGet
-    accessToken = req?.query?.accessToken
+    nextGet = req.query.nextGet
+    accessToken = req.query.accessToken
 
     if (nextGet && accessToken) {
         try {
