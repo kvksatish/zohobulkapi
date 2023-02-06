@@ -4,7 +4,6 @@ const app = express();
 const request = require("request");
 const unzipper = require("unzipper");
 const csv = require("csvtojson");
-const axios = require("axios");
 
 const PORT = process.env.PORT || 8080;
 
