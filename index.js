@@ -7,14 +7,13 @@ const csv = require("csvtojson");
 
 const PORT = process.env.PORT || 8080;
 
-let accessToken = "";
-let nextGet = "";
-let fullData = [];
+
 
 app.use(express.json());
 app.use(cors());
 
 app.get("/getdata", async (req, res) => {
+    let fullData = [];
 
     console.log(req.query, "dcscscscwe")
     nextGet = req.query.nextGet
